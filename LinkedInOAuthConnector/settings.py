@@ -25,20 +25,25 @@ SECRET_KEY = 'jy$(qk%3ix7i-)qllc5e_$a79&#k92uj%))-l8c@kb=x7gwpz0'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [0]
 
-
+SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
-    'social.apps.django_app.default',
-    'main',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.sites', 
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.linkedin_oauth2',
+    'main',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -50,6 +55,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social.apps.django_app.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'LinkedInOAuthConnector.urls'
@@ -61,10 +67,13 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
+                # Already defined Django-related contexts here
+ 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # `allauth` needs this from django
+                'django.template.context_processors.request',
             ],
         },
     },
@@ -78,8 +87,12 @@ WSGI_APPLICATION = 'LinkedInOAuthConnector.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'Bryan',
+        'USER': 'bryan',
+        'PASSWORD': 'diablos3',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
@@ -105,30 +118,34 @@ AUTH_PASSWORD_VALIDATORS = [
 print os.environ.get('LINKEDIN_OAUTH2_KEY')
 print os.environ.get('LINKEDIN_OAUTH2_SECRET')
 
-SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY = os.environ.get('LINKEDIN_OAUTH2_KEY')
-SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET =os.environ.get('LINKEDIN_OAUTH2_SECRET')
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '//'
-SOCIAL_AUTH_LINKEDIN_SCOPE = ['r_basicprofile', 'r_emailaddress']
-SOCIAL_AUTH_LINKEDIN_FIELD_SELECTORS = ['email-address', 'headline', 'industry']
-# Arrange to add the fields to UserSocialAuth.extra_data
-SOCIAL_AUTH_LINKEDIN_EXTRA_DATA = [('id', 'id'),
-                                   ('firstName', 'first_name'),
-                                   ('lastName', 'last_name'),
-                                   ('emailAddress', 'email_address'),
-                                   ('headline', 'headline'),
-                                   ('industry', 'industry')]
-AUTHENTICATION_BACKENDS = (
-    'social.backends.open_id.OpenIdAuth',
-    'social.backends.linkedin.LinkedinOAuth2',
-    'django.contrib.auth.backends.ModelBackend',
-    )
-LOGIN_REDIRECT_URL = '/'
-TEMPLATE_CONTEXT_PROCESSORS = (
+#SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
 
-'social.apps.django_app.context_processors.backends',
-'social.apps.django_app.context_processors.login_redirect',
+#SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY = os.environ.get('LINKEDIN_OAUTH2_KEY')
+#SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET =os.environ.get('LINKEDIN_OAUTH2_SECRET')
+#SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+#SOCIAL_AUTH_LINKEDIN_SCOPE = ['r_basicprofile', 'r_emailaddress']
+#SOCIAL_AUTH_LINKEDIN_FIELD_SELECTORS = ['email-address', 'headline', 'industry']
+# Arrange to add the fields to UserSocialAuth.extra_data
+#SOCIAL_AUTH_LINKEDIN_EXTRA_DATA = [('id', 'id'),
+#                                   ('firstName', 'first_name'),
+#                                   ('lastName', 'last_name'),
+#                                   ('emailAddress', 'email_address'),
+#                                   ('headline', 'headline'),
+#                                   ('industry', 'industry')]
+AUTHENTICATION_BACKENDS = (
+
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+    
 )
-SOCIAL_AUTH_URL_NAMESPACE = 'social'
+#LOGIN_REDIRECT_URL = '/'
+
+
+
+#SOCIAL_AUTH_URL_NAMESPACE = 'social'
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 

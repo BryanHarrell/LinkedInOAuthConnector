@@ -21,6 +21,6 @@ from main import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^main/', include('main.urls')),
-    url('', include('social.apps.django_app.urls', namespace='social')),
+    url(r'^accounts/', include('allauth.urls')),
     url(r'^$', views.index, name='index'),
 ]
